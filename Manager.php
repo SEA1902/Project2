@@ -6,7 +6,6 @@ require_once __DIR__ ."/bootstrap.php";
 use Controller\ManagerController;
 
 $managerController = new ManagerController();
-$roomController = new \Controller\RoomController();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case "GET":
@@ -14,7 +13,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case "POST":
-//        $roomController->updateRoom();
         break;
     default:
         //404;

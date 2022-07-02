@@ -6,10 +6,10 @@ ini_set("display_errors", "1");
 require __DIR__  . "/bootstrap.php";
 use Controller\LoginController;
 $loginController = new LoginController();
-$managerController = new \Controller\ManagerController();
+
 switch ($_SERVER['REQUEST_METHOD']) {
     case "GET":
-        $managerController->renderManager();
+        $loginController->renderLogin();
         break;
 
     case "POST":
