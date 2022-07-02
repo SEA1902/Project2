@@ -1,0 +1,326 @@
+<?php
+session_start();
+
+if(isset($_SESSION["manager"])){
+    $manager = $_SESSION["manager"];
+    $id = $manager[0]["id"];
+}else{
+    header('Location: Login.php');
+}
+
+use Controller\RoomController;
+$roomController = new RoomController();
+$nameCurrentBuilding = $_SESSION['nameCurrentBuilding'];
+$buildings = $roomController->getAllBuilding();
+$currentBuilding = $roomController->getBuilding($nameCurrentBuilding);
+$roomID = $_GET['roomID'];
+$currentR = $roomController->getRoomById($roomID);
+$currentRoom = $currentR[0];
+//var_dump($currentRoom);
+$rooms = $roomController->getRoomByBuilding($currentBuilding[0]['buildID']);
+?>
+<?php
+$equipments = $roomController->getEquipmentByRoomID($currentRoom['roomID']);
+$students = $roomController->getAllStudent($currentRoom['roomID']);
+$count_students = sizeof($students);
+?>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/Project2/css/Manager.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <title>Document</title>
+    </script>
+</head>
+<body>
+<div class = "web-page">
+    <!--          header            -->
+    <header class="header-wrapper">
+        <div class="header">
+            <div class="header-group">
+                <img src="https://storage.googleapis.com/hust-files/5807675312963584/images/hust-logo-official_.3m.jpeg">
+                <div>
+                    <div class="web-name-title">Hệ thống Quản lý Phòng tự học</div>
+                    <div class="school-name-title">Trường Đại học Bách Khoa Hà Nội</div>
+                </div>
+            </div>
+
+            <div class="header-group">
+                <?php
+                echo "<i class='fa-solid fa-user icon-user'></i>";
+                ?>
+                <span class='header-identity'>
+                    <?php
+                        echo $manager[0]["email"];
+                    ?>
+                </span>
+            </div>
+        </div>
+
+        <nav class="nav-wrapper">
+            <div class="nav-menu">
+                <?php
+                for ($i = 1; $i <= sizeof($buildings); $i++) {
+                    if($buildings[$i-1]['name'] == $nameCurrentBuilding){
+                        $buildingUrl = "Manager.php?currentBuilding=".$buildings[$i-1]['name'];
+                        echo "<a class='nav-link active' href='$buildingUrl'>".$buildings[$i-1]['name']."</a>";
+                    }
+                    else {
+//                        $buildingUrl = "Manager.php?currentBuilding=".$nameCurrentBuilding;
+                        $buildingUrl = "Manager.php?currentBuilding=".$buildings[$i-1]['name']." ";
+                        echo "<a class='nav-link' href='$buildingUrl'>".$buildings[$i-1]['name']."</a>";
+                    }
+                }
+                ?>
+            </div>
+        </nav>
+    </header>
+
+    <!----------------------------    container------------------------>
+    <div class="container">
+        <!-------------------------------sidebar-------------------------->
+        <aside id="sidebar" class="sidebar-wrapper">
+            <?php
+            for($i = 1; $i <= $currentBuilding[0]['number_floors']; $i++){
+                echo "<div class='sidebar-group'>";
+                echo "<div class='sidebar-dropdown'>";
+                echo "<label>Tầng ".$i."</label>";
+                echo "<i class='fa fa-caret-down'></i>";
+                echo "</div>";
+
+                echo "<div class='sub-menu'>";
+                foreach ($rooms as $room){
+                    if($room['floor'] == $i){
+                        $roomUrl = "RoomManager.php?roomID=".$room['roomID'] ;
+                        if($room['roomID'] == $currentRoom['roomID']){
+                            echo "<a id =".$room['roomID']." class='active' href='$roomUrl'>".$room['name']."</a>";
+                        } else{
+                            echo "<a id =".$room['roomID']."  href='$roomUrl'>".$room['name']."</a>";
+                        }
+                    }
+                }
+                echo "</div>";
+                echo "</div>";
+            }
+            ?>
+
+            <div class="sidebar-group">
+                <a class="sidebar-item" href='#'>Yêu cầu sinh viên</a>
+            </div>
+        </aside>
+
+        <!--        content            -->
+        <content class="content-wrapper">
+<!--            room-information-------------->
+            <div id="room-wrapper" class="room-wrapper">
+                <div class="room-detail">
+                    <label class="room-detail-label">Thông tin phòng</label>
+                    <div class="room-group">
+                        <label> Tên phòng: </label>
+                        <?php echo $currentRoom['name']?>
+                    </div>
+
+                    <div class="room-group">
+                        <label> Tổng số chỗ ngồi: </label>
+                        <?php echo $currentRoom['seat']?>
+                    </div>
+
+                    <div class="room-group">
+                        <label> Trạng thái: </label>
+                        <?php echo $count_students."/".$currentRoom['seat'] ."-".$currentRoom['status']?>
+                    </div>
+
+                    <div class="room-group">
+                        <label> Danh sách thiết bị: </label>
+                        <?php
+                        foreach ($equipments as $equipment){
+                            echo "<div class='equipment'>";
+                            echo "<span>".$equipment['name'].":</span>";
+                            if($equipment['status'] == 'Bật'){
+                                echo "<button class='equipment-on active'> Bật </button>";
+                                echo "<button class='equipment-off'> Tắt </button>";
+                                echo "<button class='equipment-broken'> Hỏng </button>";
+                            }elseif ($equipment['status'] == "Tắt"){
+                                echo "<button class='equipment-on'> Bật </button>";
+                                echo "<button class='equipment-off active'> Tắt </button>";
+                                echo "<button class='equipment-broken'> Hỏng </button>";
+                            }else{
+                                echo "<button class='equipment-on'> Bật </button>";
+                                echo "<button class='equipment-off'> Tắt </button>";
+                                echo "<button class='equipment-broken active'> Hỏng </button>";
+                            }
+                            echo "</div>";
+                        }
+                        ?>
+                    </div>
+
+                    <div class="room-group btn-group">
+                        <button id = "btn-student" class="btn-student"> Danh sách sinh viên</button>
+                        <button id = "btn-update" class="btn-update"> Cập nhật thông tin</button>
+                    </div>
+                </div>
+
+                <div class="room-calender">
+
+                </div>
+            </div>
+<!-------------------------table-student------------------------>
+            <div id="content-table" class="content-table">
+                <div id="table-exit" class="exit">&times;</div>
+                <table class="table-student">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID Sinh viên</th>
+                        <th scope="col">Tên sinh viên</th>
+                        <th scope="col">SĐT</th>
+                        <th scope="col">Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    foreach ($students as $student){
+                        echo "<tr>";
+                        echo "<td >".$student['studentID']."</td>";
+                        echo "<td >".$student['name']."</td>";
+                        echo "<td >".$student['phone']."</td>";
+                        echo "<td >".$student['email']."</td>";
+                        echo "</tr>";
+                    }
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+<!-------------------update--------------------->
+            <div id="content-update" class="content-update">
+                <div id="update-exit" class="exit">&times;</div>
+                <form method="post" action="" class="room-detail">
+                    <label class="room-detail-label">Thông tin phòng</label>
+                    <input name="roomID" type="hidden" value="<?php echo $currentRoom['roomID'] ?>">
+                    <div class="room-group">
+                        <label> Tên phòng: </label>
+                        <input name="name" value="<?php echo $currentRoom['name']?>">
+                    </div>
+
+                    <div class="room-group">
+                        <label> Tổng số chỗ ngồi: </label>
+                        <input name="seat" value="<?php echo $currentRoom['seat']?>">
+                    </div>
+
+                    <div class="room-group" style="display: flex">
+                        <label> Trạng thái: </label>
+                        <div class="status-room">
+                        <?php
+                        if($currentRoom['status'] = "Còn chỗ"){
+                            echo "<input type='radio' name='statusRoom' value='Còn chỗ' checked>";
+                            echo "<span>Còn chỗ</span>";
+                            echo "<input type='radio' name='statusRoom' value='Đang có lớp'>";
+                            echo "<span>Đang có lớp</span>";
+                        }else{
+                            echo "<input type='radio' name='statusRoom' value='Còn chỗ'>";
+                            echo "<span>Còn chỗ</span>";
+                            echo "<input type='radio' name='statusRoom' value='Đang có lớp' checked>";
+                            echo "<span>Đang có lớp</span>";
+                        }
+                        ?>
+                        </div>
+                    </div>
+
+                    <div class="room-group">
+                        <label> Danh sách thiết bị: </label>
+                        <?php
+                        foreach ($equipments as $equipment){
+                            echo "<div class='equipment'>";
+                            echo "<span>".$equipment['name'].":</span>";
+                            if($equipment['status'] == 'Bật'){
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Bật' checked>";
+                                echo "<span>Bật</span>";
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Tắt'>";
+                                echo "<span>Tắt</span>";
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Hỏng'>";
+                                echo "<span>Hỏng</span>";
+                            }elseif ($equipment['status'] == "Tắt"){
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Bật'>";
+                                echo "<span>Bật</span>";
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Tắt' checked>";
+                                echo "<span>Tắt</span>";
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Hỏng'>";
+                                echo "<span>Hỏng</span>";
+                            }else{
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Bật'>";
+                                echo "<span>Bật</span>";
+                                echo "<input type='radio' name=".$equipment['equipID']." value='Tắt'>";
+                                echo "<span>Tắt</span>";
+                                echo "<input type='radio' name= ".$equipment['equipID']." value='Hỏng' checked>";
+                                echo "<span>Hỏng</span>";
+                            }
+                            echo "</div>";
+                        }
+                        ?>
+                    </div>
+
+                    <div class="btn-group">
+                        <input type="submit" class="btn-confirm-update" name="update" value="Xác nhận cập nhật">
+                        <div id = "btn-cancle" class="btn-cancle"> Hủy</div>
+                    </div>
+                </form>
+            </div>
+        </content>
+
+    </div>
+
+</div>
+<script>
+    var student_btn = document.getElementById("btn-student");
+    var room_wrapper = document.getElementById("room-wrapper");
+    var table_student = document.getElementById("content-table");
+    var table_exit = document.getElementById("table-exit");
+    var update_exit = document.getElementById("update-exit");
+    var btn_update = document.getElementById("btn-update");
+    var content_update = document.getElementById("content-update");
+    var btn_cancle = document.getElementById("btn-cancle");
+
+    student_btn.onclick = function (){
+        room_wrapper.style.display = "none";
+        table_student.style.display = "block";
+    }
+    table_exit.onclick = function (){
+        room_wrapper.style.display = "block";
+        table_student.style.display = "none";
+    }
+    update_exit.onclick = function (){
+        room_wrapper.style.display = "block";
+        content_update.style.display = "none";
+    }
+
+    btn_update.onclick = function (){
+        room_wrapper.style.display = "none";
+        content_update.style.display = "block";
+    }
+    btn_cancle.onclick = function (){
+        room_wrapper.style.display = "block";
+        content_update.style.display = "none";
+    }
+</script>
+<script>
+    var dropdown = document.getElementsByClassName("sidebar-dropdown");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function() {
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

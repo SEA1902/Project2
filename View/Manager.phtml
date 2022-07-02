@@ -1,7 +1,23 @@
 <?php
-
-namespace View\Manager;
 session_start();
+
+if(isset($_SESSION["manager"])){
+    $manager = $_SESSION["manager"];
+    $id = $manager[0]["id"];
+}else{
+    header('Location: Login.php');
+}
+
+use Controller\RoomController;
+$roomController = new RoomController();
+$buildings = $roomController->getAllBuilding();
+$nameCurrentBuilding = "TC";
+if(isset($_GET['currentBuilding'])){
+    $nameCurrentBuilding = $_GET['currentBuilding'];
+    $_SESSION['nameCurrentBuilding'] = $nameCurrentBuilding;
+}
+$currentBuilding = $roomController->getBuilding($nameCurrentBuilding);
+$rooms = $roomController->getRoomByBuilding($currentBuilding[0]['buildID']);
 
 ?>
 
@@ -12,11 +28,106 @@ session_start();
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/Project2/css/Manager.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <title>Document</title>
+    </script>
 </head>
 <body>
+<div class = "web-page">
+    <!--          header            -->
+    <header class="header-wrapper">
+        <div class="header">
+            <div class="header-group">
+                <img src="https://storage.googleapis.com/hust-files/5807675312963584/images/hust-logo-official_.3m.jpeg">
+                <div>
+                    <div class="web-name-title">Hệ thống Quản lý Phòng tự học</div>
+                    <div class="school-name-title">Trường Đại học Bách Khoa Hà Nội</div>
+                </div>
+            </div>
 
-<h1>Manager</h1>
+            <div class="header-group">
+                <?php
+                echo "<i class='fa-solid fa-user icon-user'></i>";
+                ?>
+                <span class='header-identity'>
+                    <?php
+                    echo $manager[0]["email"];
+                    ?>
+                </span>
+            </div>
+        </div>
+
+        <nav class="nav-wrapper">
+            <div class="nav-menu">
+                <?php
+                for ($i = 1; $i <= sizeof($buildings); $i++) {
+                    $buildingUrl = "Manager.php";
+                    if($buildings[$i-1]['name'] == $nameCurrentBuilding){
+                        echo "<a class='nav-link active' href='$buildingUrl'>".$buildings[$i-1]['name']."</a>";
+                    }
+                    else {
+                        $buildingUrl .= "?currentBuilding=".$buildings[$i-1]['name']." ";
+                        echo "<a class='nav-link' href='$buildingUrl'>".$buildings[$i-1]['name']."</a>";
+                    }
+                }
+                ?>
+            </div>
+        </nav>
+    </header>
+
+    <!----------------------------    container------------------------>
+    <div class="container">
+        <!-------------------------------sidebar-------------------------->
+        <aside id="sidebar" class="sidebar-wrapper">
+            <?php
+            for($i = 1; $i <= $currentBuilding[0]['number_floors']; $i++){
+                echo "<div class='sidebar-group'>";
+                echo "<div class='sidebar-dropdown'>";
+                echo "<label>Tầng ".$i."</label>";
+                echo "<i class='fa fa-caret-down'></i>";
+                echo "</div>";
+
+                echo "<div class='sub-menu'>";
+                foreach ($rooms as $room){
+                    if($room['floor'] == $i){
+                        $roomUrl = "RoomManager.php?roomID=".$room['roomID'] ;
+                        echo "<a id =".$room['roomID']." href='$roomUrl'>".$room['name']."</a>";
+                    }
+                }
+                echo "</div>";
+                echo "</div>";
+            }
+            ?>
+
+            <div class="sidebar-group">
+                <a class="sidebar-item" href='#'>Yêu cầu sinh viên</a>
+            </div>
+        </aside>
+        <!--        content            -->
+        <content class="content-wrapper">
+<!--            --><?php //include "RoomManager.php"; ?>
+        </content>
+
+    </div>
+
+</div>
+
+<script>
+    var dropdown = document.getElementsByClassName("sidebar-dropdown");
+    var i;
+
+    for (i = 0; i < dropdown.length; i++) {
+        dropdown[i].addEventListener("click", function() {
+            var dropdownContent = this.nextElementSibling;
+            if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+            } else {
+                dropdownContent.style.display = "block";
+            }
+        });
+    }
+</script>
+
 </body>
 </html>

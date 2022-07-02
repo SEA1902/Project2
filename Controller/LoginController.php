@@ -47,7 +47,7 @@ class LoginController
 
         if($count > 0){
             session_start();
-            $_SESSION['user'] = $stmt->fetchAll();
+            $_SESSION['manager'] = $stmt->fetchAll();
             header('Location: Manager.php');exit;
         }else{
             $err = "Email hoặc mật khẩu không chính xác";

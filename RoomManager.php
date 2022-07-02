@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 require_once __DIR__ ."/bootstrap.php";
 
-use Controller\ManagerController;
+use Controller\RoomController;
 
-$managerController = new ManagerController();
-$roomController = new \Controller\RoomController();
+$roomController = new RoomController();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case "GET":
-        $managerController->renderManager();
+        $roomController->renderRoomManager();
         break;
 
     case "POST":
-//        $roomController->updateRoom();
+        $roomController->updateRoom();
         break;
     default:
         //404;
