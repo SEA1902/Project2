@@ -52,11 +52,9 @@ class RoomDb
     }
 
     public function getAllStudent($roomID){
-        $sql = "SELECT s.studentID, s.name, s.phone, s.email
-                FROM student_classroom
-                    JOIN classroom ON classroom.roomID=student_classroom.roomID
-                    JOIN student as s ON s.studentID=student_classroom.studentID
-                WHERE student_classroom.roomID = '$roomID'";
+        $sql = "SELECT*
+                FROM student
+                WHERE student.roomID = '$roomID'";
         $stmt = $this->connect->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();

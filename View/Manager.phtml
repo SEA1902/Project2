@@ -14,8 +14,9 @@ $buildings = $roomController->getAllBuilding();
 $nameCurrentBuilding = "TC";
 if(isset($_GET['currentBuilding'])){
     $nameCurrentBuilding = $_GET['currentBuilding'];
-    $_SESSION['nameCurrentBuilding'] = $nameCurrentBuilding;
 }
+$_SESSION['nameCurrentBuilding'] = $nameCurrentBuilding;
+
 $currentBuilding = $roomController->getBuilding($nameCurrentBuilding);
 $rooms = $roomController->getRoomByBuilding($currentBuilding[0]['buildID']);
 

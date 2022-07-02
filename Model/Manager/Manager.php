@@ -7,11 +7,15 @@ class Manager
     protected $id;
     protected $email;
     protected $password;
+    protected $name;
+    protected $phone;
 
-    public function __construct($email, $password)
+    public function __construct($email, $password, $name, $phone)
     {
         $this->email = $email;
         $this->password = $password;
+        $this->name = $name;
+        $this->phone = $phone;
     }
 
     public function getId()
@@ -39,4 +43,23 @@ class Manager
         $this->password = $password;
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    public function setPhone($phone): void
+    {
+        $this->phone = $phone;
+    }
 }
