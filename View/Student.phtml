@@ -46,21 +46,20 @@ namespace View\Student;
             use Controller\RoomController;
                     
             $roomController = new RoomController();
-        
-            $roomController->selectBuilding();
-            $bdings = $_SESSION['building'];
+ 
+            $bdings = $roomController->getAllBuilding();
             foreach($bdings as $bding){ 
                 echo "<h1 style='padding-left: 20px;
-                                background-color: beige;font-family: sans-serif'>$bding[0]</h1>";
-                $roomController->selectRoom($bding[0]);
-                $rooms = $_SESSION[$bding[0]];
+                                background-color: beige;font-family: sans-serif'>".$bding['name']."</h1>";
+
+                $rooms = $roomController->getRoomByBuilding($bding['buildID']);
                 echo "
                 <table style=''>
                     <tr>";
                     foreach($rooms as $room){
                         echo "<td style='padding:0px 25px; border-right: 1px solid'>"
-                                . "<b>$room[1]</b><br><br><i>"
-                                .$room[4]."</i></td>";
+                                . "<b>".$room['name']."</b><br><br><i>"
+                                .$room['status']."</i></td>";
                     }
                 echo "</tr>
                 </table>";

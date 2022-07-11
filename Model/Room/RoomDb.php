@@ -8,22 +8,7 @@ class RoomDb {
     public function  __construct($connect) {
         $this->connect = $connect;
     }
-    
-    public function selectBuilding() {
-        $sql = "SELECT DISTINCT(location) FROM classroom";
-        $stmt = $this->connect->prepare($sql);
-        $stmt->execute();
-        return $stmt;
-    }
-    
-    
-    public function selectRoom($bname) {
-        $sql = "SELECT * FROM classroom WHERE location = '".$bname."'";
-        $stmt = $this->connect->prepare($sql);       
-        $stmt->execute();
-        return $stmt;
-    }
-    
+   
     public function checkStudentInRoom($email){
         $sql = "SELECT roomID from student WHERE email = '".$email."'";
         $stmt = $this->connect->prepare($sql);       
@@ -70,9 +55,7 @@ class RoomDb {
         $stmt->execute();
     }
     
-    
-    
-   public function getAllBuilding(){
+    public function getAllBuilding(){
         $sql = "SELECT * FROM building";
         $stmt = $this->connect->prepare($sql);
         $stmt->execute();

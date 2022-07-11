@@ -10,16 +10,6 @@ class RoomController {
         $this->roomDb = new RoomDb($db->connect());
     }
     
-    public function selectBuilding(): void {
-        $stmt = $this->roomDb->selectBuilding();
-        $_SESSION['building'] = $stmt->fetchAll();
-    }
-    
-    public function selectRoom($bname): void {
-        $stmt = $this->roomDb->selectRoom($bname);        
-        $_SESSION[$bname] = $stmt->fetchAll();
-    }
-    
     public function checkCheckinStatus($roomName): void {
         date_default_timezone_set("Asia/Ho_Chi_Minh");
         $stmt = $this->roomDb->selectTimetable($roomName);
@@ -39,7 +29,6 @@ class RoomController {
             foreach($rcs as $rc){
                 if($curwday == $rc[1]){
                     if(($curtime < $rc[2] || $curtime > $rc[3]) && ($curtime > '06:45:00' && $curtime < '17:30:00')){
-                        //session_start();
                         $email = $_SESSION['user'][0][3];
                         $this->roomDb->addStudent($email, $roomName);
                         $alert = 'Ban da check in thanh cong!';
